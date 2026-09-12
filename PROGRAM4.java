@@ -1,23 +1,27 @@
-import java.util.Scanner;
+/**
+ * Week 6 Assignment - Problem 4: Exam Hall Ticket Reference Management
+ * Demonstrates Java reference assignment vs separate object instantiation.
+ */
 public class PROGRAM4 {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter first number: ");
-        int number1 = sc.nextInt();
-        System.out.print("Enter second number: ");
-        int number2 = sc.nextInt();
 
-        int origNumber1 = number1;
-        int origNumber2 = number2;
+    static class HallTicket {
+        String studentName;
+        int seatNumber;
 
-        while (number2 != 0) {
-            int remainder = number1 % number2;
-            number1 = number2;
-            number2 = remainder;
+        public HallTicket(String studentName, int seatNumber) {
+            this.studentName = studentName;
+            this.seatNumber = seatNumber;
         }
-
-        System.out.println("The GCD of " + origNumber1 + " and " + origNumber2 + " is " + number1);
-
-        sc.close();
     }
-} 
+
+    public static void main(String[] args) {
+        HallTicket priya = new HallTicket("Priya", 0);
+        HallTicket copy = priya;
+        copy.seatNumber = 45;
+        HallTicket separate = new HallTicket("Priya", 45);
+
+        System.out.println("Priya's seatNumber (via first variable): " + priya.seatNumber);
+        System.out.println("copy == priya: " + (copy == priya));
+        System.out.println("separate == priya: " + (separate == priya));
+    }
+}
