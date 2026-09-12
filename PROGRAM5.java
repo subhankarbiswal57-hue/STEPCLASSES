@@ -1,26 +1,33 @@
-import java.util.Scanner;
-
+/**
+ * Week 6 Assignment - Problem 5: Employee and Company Information Management
+ * Demonstrates static fields, static methods, and instance variables.
+ */
 public class PROGRAM5 {
+
+    static class Employee {
+        private String empName;
+        private double salary;
+
+        private static String companyName = "Bright Horizon Technologies";
+        private static int employeeCount = 0;
+
+        public Employee(String empName, double salary) {
+            this.empName = empName;
+            this.salary = salary;
+            employeeCount++;
+        }
+
+        public static void printCompanyInfo() {
+            System.out.println(companyName);
+            System.out.println("Employees on record: " + employeeCount);
+        }
+    }
+
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter a number: ");
-        int number = sc.nextInt();
-        int origNumber = number;
+        new Employee("Amit", 50000);
+        new Employee("Sneha", 60000);
+        new Employee("Rahul", 55000);
 
-        int sum = 0;
-
-        while (number != 0) {
-            int digit = number % 10;
-            sum = sum + (digit * digit * digit);
-            number = number / 10;
-        }
-
-        if (sum == origNumber) {
-            System.out.println("Is the number " + origNumber + " an Armstrong number? Yes");
-        } else {
-            System.out.println("Is the number " + origNumber + " an Armstrong number? No");
-        }
-
-        sc.close();
+        Employee.printCompanyInfo();
     }
 }
