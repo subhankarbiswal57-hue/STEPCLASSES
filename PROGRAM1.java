@@ -1,30 +1,42 @@
 import java.util.Scanner;
 
+/**
+ * Problem 1: ATM PIN Length Validator
+ * Validates that an entered PIN string is exactly 4 digits long.
+ */
 public class PROGRAM1 {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter a number: ");
-        int number = sc.nextInt();
 
-        boolean isPrime = true;
-
-        for (int i = 2; i < number; i++) {
-            if (number % i == 0) {
-                isPrime = false;
-                break;
-            }
+    /**
+     * Checks whether the PIN length is exactly 4.
+     *
+     * @param pin the entered PIN string
+     */
+    public static void checkPinLength(String pin) {
+        if (pin == null) {
+            System.out.println("Invalid PIN - must be exactly 4 digits.");
+            return;
         }
 
-        if (number < 2) {
-            isPrime = false;
-        }
-
-        if (isPrime) {
-            System.out.println("Is the number " + number + " a Prime number? Yes");
+        int pinLength = pin.length();
+        if (pinLength != 4) {
+            System.out.println("Invalid PIN - must be exactly 4 digits.");
         } else {
-            System.out.println("Is the number " + number + " a Prime number? No");
+            System.out.println("PIN length OK.");
         }
+    }
 
-        sc.close();
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        try {
+            System.out.print("Enter PIN: ");
+            if (scanner.hasNextLine()) {
+                String inputPin = scanner.nextLine();
+                checkPinLength(inputPin);
+            }
+        } catch (Exception e) {
+            System.err.println("An error occurred while reading input: " + e.getMessage());
+        } finally {
+            scanner.close();
+        }
     }
 }
