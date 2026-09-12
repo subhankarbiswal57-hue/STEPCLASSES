@@ -1,30 +1,51 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
+/**
+ * Week 5 - Problem 1: Hackathon Score Curve Booster
+ * Category C - Easy
+ * Boosts every score in-place by a flat bonus and formats using Arrays.toString().
+ */
 public class PROGRAM1 {
+
+    /**
+     * Modifies the caller's original array directly by adding bonus to each score.
+     *
+     * @param scores array of integer scores
+     * @param bonus  non-negative integer bonus
+     */
+    public static void curveScores(int[] scores, int bonus) {
+        if (scores == null || bonus < 0) {
+            return;
+        }
+
+        for (int i = 0; i < scores.length; i++) {
+            scores[i] += bonus;
+        }
+    }
+
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter a number: ");
-        int number = sc.nextInt();
+        Scanner scanner = new Scanner(System.in);
+        try {
+            System.out.print("Enter number of scores: ");
+            if (scanner.hasNextInt()) {
+                int count = scanner.nextInt();
+                int[] scores = new int[count];
+                System.out.println("Enter " + count + " scores:");
+                for (int i = 0; i < count; i++) {
+                    scores[i] = scanner.nextInt();
+                }
 
-        boolean isPrime = true;
+                System.out.print("Enter bonus: ");
+                int bonus = scanner.nextInt();
 
-        for (int i = 2; i < number; i++) {
-            if (number % i == 0) {
-                isPrime = false;
-                break;
+                curveScores(scores, bonus);
+                System.out.println(Arrays.toString(scores));
             }
+        } catch (Exception e) {
+            System.err.println("An error occurred: " + e.getMessage());
+        } finally {
+            scanner.close();
         }
-
-        if (number < 2) {
-            isPrime = false;
-        }
-
-        if (isPrime) {
-            System.out.println("Is the number " + number + " a Prime number? Yes");
-        } else {
-            System.out.println("Is the number " + number + " a Prime number? No");
-        }
-
-        sc.close();
     }
 }
