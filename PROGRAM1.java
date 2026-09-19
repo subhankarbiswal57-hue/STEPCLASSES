@@ -1,70 +1,67 @@
-import java.util.Scanner;
-
 /**
- * Week 1 - Problem 1: The Exam Hall Seat Duplication Checker
- * Checks for duplicate seat numbers assigned in an exam hall using arrays and loops only (no Collections).
+ * Category C - Practice Problem 1: The Piggy Bank
+ * 
+ * Scenario:
+ * A savings app tracks how much money a kid has put away.
+ * 
+ * Problem Statement:
+ * Create a PiggyBank class where money can only be added or removed through specific actions - never set directly to any amount.
+ * 
+ * Requirements:
+ * - The savings amount must be private, changed only by deposit and withdraw methods.
+ * - A withdrawal larger than the current savings must be rejected, not applied.
+ * - Give the piggy bank a final ID that's fixed the moment it's created.
+ * - Provide a way to check the current savings, but no way to set it directly.
  */
 public class PROGRAM1 {
 
-    /**
-     * Scans the array of seat numbers and prints duplicates or confirms uniqueness.
-     *
-     * @param seatNumbers array of integer seat numbers
-     */
-    public static void checkDuplicateSeats(int[] seatNumbers) {
-        if (seatNumbers == null || seatNumbers.length == 0) {
-            System.out.println("No Duplicate Seats Found");
-            return;
+    static class PiggyBank {
+        private final String id;
+        private double savings;
+
+        public PiggyBank(String id) {
+            this.id = id;
+            this.savings = 0.0;
         }
 
-        boolean foundAnyDuplicate = false;
-        int totalSeats = seatNumbers.length;
+        public String getId() {
+            return id;
+        }
 
-        for (int i = 0; i < totalSeats; i++) {
-            // Check if seatNumbers[i] has already been seen earlier to avoid printing the same duplicate multiple times
-            boolean alreadyReported = false;
-            for (int k = 0; k < i; k++) {
-                if (seatNumbers[k] == seatNumbers[i]) {
-                    alreadyReported = true;
-                    break;
-                }
-            }
-            if (alreadyReported) {
-                continue;
-            }
-
-            // Check if seatNumbers[i] appears again in the remaining elements
-            for (int j = i + 1; j < totalSeats; j++) {
-                if (seatNumbers[i] == seatNumbers[j]) {
-                    System.out.println("Duplicate Seat Number Found: " + seatNumbers[i]);
-                    foundAnyDuplicate = true;
-                    break;
-                }
+        public void deposit(double amount) {
+            if (amount > 0) {
+                savings += amount;
+                System.out.println("Deposited " + amount + " -> savings = " + (savings % 1 == 0 ? (int)savings : savings));
+            } else {
+                System.out.println("Invalid deposit amount.");
             }
         }
 
-        if (!foundAnyDuplicate) {
-            System.out.println("No Duplicate Seats Found");
+        public void withdraw(double amount) {
+            if (amount <= 0) {
+                System.out.println("Invalid withdrawal amount.");
+            } else if (amount > savings) {
+                System.out.println("Withdrawal of " + amount + " -> rejected, savings stays " + (savings % 1 == 0 ? (int)savings : savings));
+            } else {
+                savings -= amount;
+                System.out.println("Withdrew " + amount + " -> savings = " + (savings % 1 == 0 ? (int)savings : savings));
+            }
+        }
+
+        public double getSavings() {
+            return savings;
         }
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter number of assigned seats: ");
-            if (scanner.hasNextInt()) {
-                int seatCount = scanner.nextInt();
-                int[] assignedSeats = new int[seatCount];
-                System.out.println("Enter " + seatCount + " seat numbers:");
-                for (int i = 0; i < seatCount; i++) {
-                    assignedSeats[i] = scanner.nextInt();
-                }
-                checkDuplicateSeats(assignedSeats);
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred while reading seat inputs: " + e.getMessage());
-        } finally {
-            scanner.close();
-        }
+        System.out.println("=== Testing PiggyBank ===");
+        PiggyBank pb = new PiggyBank("PB-1");
+        System.out.println("Created Piggy Bank with ID: " + pb.getId());
+        
+        pb.deposit(100);
+        pb.withdraw(30);
+        pb.withdraw(500);
+        
+        System.out.println("Final savings: " + pb.getSavings());
     }
 }
