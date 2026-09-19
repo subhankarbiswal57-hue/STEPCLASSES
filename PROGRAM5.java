@@ -1,66 +1,69 @@
-import java.util.Scanner;
-
 /**
- * Week 1 - Problem 5: The Movie Review Word Length Profiler
- * Scans a review text, splits into individual words, and categorizes lengths:
- * Short (1-4 letters), Medium (5-8 letters), Long (9+ letters).
+ * Category C - Assignment Problem 5: The Shopping Cart
+ * 
+ * Scenario:
+ * An online store's cart holds the prices of items you're about to buy.
+ * 
+ * Problem Statement:
+ * Design a Cart class that stores item prices internally but only exposes the total and item count - never direct access to the prices themselves.
+ * 
+ * Requirements:
+ * - Store item prices in a private array (assume a fixed maximum number of items).
+ * - Provide a method to add an item's price to the cart.
+ * - Provide a read-only total (sum of all prices) and a read-only item count - computed on request, not stored separately.
+ * - Give the cart a final cart ID, fixed when it's created.
  */
 public class PROGRAM5 {
 
-    /**
-     * Splits review text into words, categorizes each word by character length, and prints counts.
-     *
-     * @param review movie review string
-     */
-    public static void classifyWordLengths(String review) {
-        if (review == null || review.trim().isEmpty()) {
-            System.out.println("Short: 0 | Medium: 0 | Long: 0");
-            return;
+    static class Cart {
+        private final String cartId;
+        private final double[] itemPrices;
+        private int itemCount;
+
+        public Cart(String cartId, int maxItems) {
+            this.cartId = cartId;
+            this.itemPrices = new double[maxItems];
+            this.itemCount = 0;
         }
 
-        // Split review into individual words using whitespace regex
-        String[] words = review.trim().split("\\s+");
+        public String getCartId() {
+            return cartId;
+        }
 
-        int shortCount = 0;
-        int mediumCount = 0;
-        int longCount = 0;
-
-        for (String rawWord : words) {
-            // Count letter characters in the word (strip punctuation if any)
-            int letterLength = 0;
-            for (int i = 0; i < rawWord.length(); i++) {
-                if (Character.isLetter(rawWord.charAt(i))) {
-                    letterLength++;
-                }
-            }
-
-            // If no letters found, fallback to total length
-            int effectiveLength = (letterLength > 0) ? letterLength : rawWord.length();
-
-            if (effectiveLength >= 1 && effectiveLength <= 4) {
-                shortCount++;
-            } else if (effectiveLength >= 5 && effectiveLength <= 8) {
-                mediumCount++;
-            } else if (effectiveLength >= 9) {
-                longCount++;
+        public void addItem(double price) {
+            if (itemCount < itemPrices.length) {
+                itemPrices[itemCount] = price;
+                itemCount++;
+            } else {
+                System.out.println("Cart is full.");
             }
         }
 
-        System.out.println("Short: " + shortCount + " | Medium: " + mediumCount + " | Long: " + longCount);
+        public double getTotal() {
+            // Computed on request, not stored separately
+            double total = 0;
+            for (int i = 0; i < itemCount; i++) {
+                total += itemPrices[i];
+            }
+            return total;
+        }
+
+        public int getItemCount() {
+            // Read-only item count
+            return itemCount;
+        }
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter movie review: ");
-            if (scanner.hasNextLine()) {
-                String reviewText = scanner.nextLine();
-                classifyWordLengths(reviewText);
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred while profiling review: " + e.getMessage());
-        } finally {
-            scanner.close();
-        }
+        System.out.println("=== Testing Shopping Cart ===");
+        Cart cart = new Cart("CART-5", 20);
+        System.out.println("Cart ID: " + cart.getCartId());
+
+        cart.addItem(250);
+        cart.addItem(99);
+        cart.addItem(151);
+
+        System.out.println("cart.getTotal() -> " + (cart.getTotal() % 1 == 0 ? (int)cart.getTotal() : cart.getTotal()));
+        System.out.println("cart.getItemCount() -> " + cart.getItemCount());
     }
 }

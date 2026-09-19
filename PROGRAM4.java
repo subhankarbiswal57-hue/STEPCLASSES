@@ -1,86 +1,56 @@
-import java.util.Scanner;
-
 /**
- * Week 1 - Problem 4: The Warehouse Inventory Balancer
- * Computes section totals, evaluates inventory balance, and tracks the maximum quantity item.
+ * Category C - Assignment Problem 4: The Traffic Light
+ * 
+ * Scenario:
+ * A traffic light cycles through red, green, and yellow, in order.
+ * 
+ * Problem Statement:
+ * Design a TrafficLight class where the color can only move forward through its cycle, never be set to an arbitrary color directly.
+ * 
+ * Requirements:
+ * - The current color must be private, changed only by a next() method that moves red -> green -> yellow -> red, in that order.
+ * - There must be no method that sets the color directly to any value.
+ * - Provide a read-only way to check the current color.
+ * - Give the light a final ID, fixed when it's created.
  */
 public class PROGRAM4 {
 
-    /**
-     * Computes totals for section A and section B, compares balances,
-     * and locates the overall highest quantity item.
-     *
-     * @param sectionA array of item quantities in Section A
-     * @param sectionB array of item quantities in Section B
-     */
-    public static void analyzeInventory(int[] sectionA, int[] sectionB) {
-        if (sectionA == null || sectionB == null || sectionA.length == 0 || sectionB.length == 0) {
-            System.out.println("Invalid inventory data.");
-            return;
+    static class TrafficLight {
+        private final String id;
+        private String color;
+
+        public TrafficLight(String id) {
+            this.id = id;
+            this.color = "RED"; // A new light starts on red
         }
 
-        int lengthA = sectionA.length;
-        int lengthB = sectionB.length;
+        public String getId() {
+            return id;
+        }
 
-        int totalA = 0;
-        int totalB = 0;
+        public String getColor() {
+            return color;
+        }
 
-        int maxQuantity = Integer.MIN_VALUE;
-        String maxSection = "";
-        int maxIndex = -1; // 1-based item index
-
-        // Scan Section A
-        for (int i = 0; i < lengthA; i++) {
-            totalA += sectionA[i];
-            if (sectionA[i] > maxQuantity) {
-                maxQuantity = sectionA[i];
-                maxSection = "Section A";
-                maxIndex = i + 1; // 1-based index (e.g. Item 1, Item 2...)
+        public String next() {
+            if ("RED".equals(color)) {
+                color = "GREEN";
+            } else if ("GREEN".equals(color)) {
+                color = "YELLOW";
+            } else if ("YELLOW".equals(color)) {
+                color = "RED";
             }
+            return color;
         }
-
-        // Scan Section B
-        for (int i = 0; i < lengthB; i++) {
-            totalB += sectionB[i];
-            if (sectionB[i] > maxQuantity) {
-                maxQuantity = sectionB[i];
-                maxSection = "Section B";
-                maxIndex = i + 1;
-            }
-        }
-
-        String status = (totalA == totalB) ? "Balanced" : "Not Balanced";
-
-        System.out.println("Section A Total: " + totalA + " | Section B Total: " + totalB +
-                           " | Status: " + status + " | Highest Quantity: " + maxQuantity +
-                           " (" + maxSection + ", Item " + maxIndex + ")");
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter number of categories per section: ");
-            if (scanner.hasNextInt()) {
-                int count = scanner.nextInt();
-                int[] sectionA = new int[count];
-                int[] sectionB = new int[count];
-
-                System.out.println("Enter " + count + " quantities for Section A:");
-                for (int i = 0; i < count; i++) {
-                    sectionA[i] = scanner.nextInt();
-                }
-
-                System.out.println("Enter " + count + " quantities for Section B:");
-                for (int i = 0; i < count; i++) {
-                    sectionB[i] = scanner.nextInt();
-                }
-
-                analyzeInventory(sectionA, sectionB);
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred while analyzing inventory: " + e.getMessage());
-        } finally {
-            scanner.close();
-        }
+        System.out.println("=== Testing TrafficLight ===");
+        TrafficLight t = new TrafficLight("TL-9");
+        System.out.println("t.getColor() -> \"" + t.getColor() + "\"");
+        System.out.println("t.next() -> \"" + t.next() + "\"");
+        System.out.println("t.next() -> \"" + t.next() + "\"");
+        System.out.println("t.next() -> \"" + t.next() + "\"");
+        System.out.println("t.next() -> \"" + t.next() + "\"");
     }
 }

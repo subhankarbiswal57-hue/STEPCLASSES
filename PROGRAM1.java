@@ -1,70 +1,66 @@
-import java.util.Scanner;
-
 /**
- * Week 1 - Problem 1: The Exam Hall Seat Duplication Checker
- * Checks for duplicate seat numbers assigned in an exam hall using arrays and loops only (no Collections).
+ * Category C - Assignment Problem 1: The Health Bar
+ * 
+ * Scenario:
+ * A game character has health that changes during battle.
+ * 
+ * Problem Statement:
+ * Design a Character class where health can never drop below 0 or rise above its maximum, and can't be set directly from outside.
+ * 
+ * Requirements:
+ * - Health must be private, changed only through takeDamage(int amount) and heal(int amount).
+ * - Health must never go below 0 (extra damage is just wasted) or above the maximum (extra healing is just wasted).
+ * - The maximum health must be final, fixed when the character is created.
+ * - Provide a read-only way to check current health - no setter for it.
  */
 public class PROGRAM1 {
 
-    /**
-     * Scans the array of seat numbers and prints duplicates or confirms uniqueness.
-     *
-     * @param seatNumbers array of integer seat numbers
-     */
-    public static void checkDuplicateSeats(int[] seatNumbers) {
-        if (seatNumbers == null || seatNumbers.length == 0) {
-            System.out.println("No Duplicate Seats Found");
-            return;
+    static class Character {
+        private final int maxHealth;
+        private int health;
+
+        public Character(int maxHealth) {
+            this.maxHealth = maxHealth;
+            this.health = maxHealth;
         }
 
-        boolean foundAnyDuplicate = false;
-        int totalSeats = seatNumbers.length;
+        public int getMaxHealth() {
+            return maxHealth;
+        }
 
-        for (int i = 0; i < totalSeats; i++) {
-            // Check if seatNumbers[i] has already been seen earlier to avoid printing the same duplicate multiple times
-            boolean alreadyReported = false;
-            for (int k = 0; k < i; k++) {
-                if (seatNumbers[k] == seatNumbers[i]) {
-                    alreadyReported = true;
-                    break;
-                }
-            }
-            if (alreadyReported) {
-                continue;
-            }
+        public int getHealth() {
+            return health;
+        }
 
-            // Check if seatNumbers[i] appears again in the remaining elements
-            for (int j = i + 1; j < totalSeats; j++) {
-                if (seatNumbers[i] == seatNumbers[j]) {
-                    System.out.println("Duplicate Seat Number Found: " + seatNumbers[i]);
-                    foundAnyDuplicate = true;
-                    break;
-                }
+        public void takeDamage(int amount) {
+            if (amount < 0) return;
+            health -= amount;
+            if (health < 0) {
+                health = 0;
             }
         }
 
-        if (!foundAnyDuplicate) {
-            System.out.println("No Duplicate Seats Found");
+        public void heal(int amount) {
+            if (amount < 0) return;
+            health += amount;
+            if (health > maxHealth) {
+                health = maxHealth;
+            }
         }
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter number of assigned seats: ");
-            if (scanner.hasNextInt()) {
-                int seatCount = scanner.nextInt();
-                int[] assignedSeats = new int[seatCount];
-                System.out.println("Enter " + seatCount + " seat numbers:");
-                for (int i = 0; i < seatCount; i++) {
-                    assignedSeats[i] = scanner.nextInt();
-                }
-                checkDuplicateSeats(assignedSeats);
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred while reading seat inputs: " + e.getMessage());
-        } finally {
-            scanner.close();
-        }
+        System.out.println("=== Testing Character Health Bar ===");
+        Character c = new Character(100);
+        System.out.println("Initial health = " + c.getHealth());
+
+        c.takeDamage(30);
+        System.out.println("c.takeDamage(30) -> health = " + c.getHealth());
+
+        c.heal(50);
+        System.out.println("c.heal(50) -> health = " + c.getHealth() + " (capped)");
+
+        c.takeDamage(150);
+        System.out.println("c.takeDamage(150) -> health = " + c.getHealth() + " (floored)");
     }
 }

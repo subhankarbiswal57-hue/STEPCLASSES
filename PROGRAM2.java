@@ -1,83 +1,62 @@
-import java.util.Scanner;
+import java.util.Arrays;
 
 /**
- * Week 1 - Problem 2: The Typing Speed Test Accuracy Checker
- * Compares typed text against original passage character by character and calculates accuracy percentage.
+ * Category C - Assignment Problem 2: The Playlist
+ * 
+ * Scenario:
+ * A music app lets you build a playlist of songs.
+ * 
+ * Problem Statement:
+ * Design a Playlist class that stores songs internally but returns a safe copy of the list, so nobody can sneak in changes from outside.
+ * 
+ * Requirements:
+ * - Store song titles in a private array (assume a fixed maximum size).
+ * - Provide a method to add a song, and one that returns all the songs added so far - as a copy, not the original array.
+ * - Changing the array returned by that method must not affect the playlist's real contents.
+ * - Provide a read-only count of how many songs are in the playlist.
  */
 public class PROGRAM2 {
 
-    /**
-     * Compares original and typed strings and prints accuracy and first mismatch info.
-     *
-     * @param original original passage text
-     * @param typed    user's typed text
-     */
-    public static void checkTypingAccuracy(String original, String typed) {
-        if (original == null || typed == null) {
-            System.out.println("Invalid input: Strings cannot be null.");
-            return;
+    static class Playlist {
+        private final String[] songs;
+        private int songCount;
+
+        public Playlist(int maxSize) {
+            this.songs = new String[maxSize];
+            this.songCount = 0;
         }
 
-        int originalLength = original.length();
-        int typedLength = typed.length();
-
-        // Compare up to the length of the strings
-        int totalLength = Math.min(originalLength, typedLength);
-        if (totalLength == 0) {
-            System.out.println("Matched: 0/0 | Accuracy: 0.00% | No Mismatches");
-            return;
-        }
-
-        int matchedCount = 0;
-        int firstMismatchPosition = -1;
-        char originalCharMismatch = ' ';
-        char typedCharMismatch = ' ';
-
-        for (int i = 0; i < totalLength; i++) {
-            char origChar = original.charAt(i);
-            char typedChar = typed.charAt(i);
-
-            if (origChar == typedChar) {
-                matchedCount++;
-            } else if (firstMismatchPosition == -1) {
-                firstMismatchPosition = i + 1; // 1-based index position
-                originalCharMismatch = origChar;
-                typedCharMismatch = typedChar;
+        public void addSong(String song) {
+            if (songCount < songs.length) {
+                songs[songCount] = song;
+                songCount++;
+            } else {
+                System.out.println("Playlist is full.");
             }
         }
 
-        double accuracyPercentage = ((double) matchedCount / totalLength) * 100.0;
-
-        StringBuilder reportBuilder = new StringBuilder();
-        reportBuilder.append("Matched: ").append(matchedCount).append("/").append(totalLength)
-                     .append(" | Accuracy: ").append(String.format("%.2f", accuracyPercentage)).append("%");
-
-        if (firstMismatchPosition != -1) {
-            reportBuilder.append(" | First Mismatch at position ").append(firstMismatchPosition)
-                         .append(" ('").append(originalCharMismatch).append("' vs '")
-                         .append(typedCharMismatch).append("')");
-        } else if (originalLength != typedLength) {
-            reportBuilder.append(" | First Mismatch at position ").append(totalLength + 1)
-                         .append(" (Length difference)");
-        } else {
-            reportBuilder.append(" | No Mismatches");
+        public String[] getSongs() {
+            // Return a safe copy of only the songs added so far
+            return Arrays.copyOf(songs, songCount);
         }
 
-        System.out.println(reportBuilder.toString());
+        public int getSongCount() {
+            return songCount;
+        }
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter original passage: ");
-            String originalText = scanner.nextLine();
-            System.out.print("Enter typed text: ");
-            String typedText = scanner.nextLine();
-            checkTypingAccuracy(originalText, typedText);
-        } catch (Exception e) {
-            System.err.println("An error occurred while evaluating typing accuracy: " + e.getMessage());
-        } finally {
-            scanner.close();
-        }
+        System.out.println("=== Testing Playlist ===");
+        Playlist p = new Playlist(10);
+        p.addSong("Song A");
+        p.addSong("Song B");
+
+        String[] copy = p.getSongs();
+        System.out.println("Initial copy[0]: " + copy[0]);
+        copy[0] = "Hacked";
+        System.out.println("Modified copy[0]: " + copy[0]);
+
+        System.out.println("Actual playlist song at index 0 after copy modification: " + p.getSongs()[0]);
+        System.out.println("Total songs in playlist: " + p.getSongCount());
     }
 }
