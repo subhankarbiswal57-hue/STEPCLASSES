@@ -1,86 +1,51 @@
-import java.util.Scanner;
-
 /**
- * Week 1 - Problem 4: The Warehouse Inventory Balancer
- * Computes section totals, evaluates inventory balance, and tracks the maximum quantity item.
+ * Category C - Practice Problem 4: The Locker Code
+ * 
+ * Scenario:
+ * A gym locker has a combination code that members can change.
+ * 
+ * Problem Statement:
+ * Design a Locker class where the combination can be changed, but never read back directly from outside the class.
+ * 
+ * Requirements:
+ * - The combination code must be private, with no getter at all.
+ * - Provide a method to change the code that requires the current code to be entered correctly first.
+ * - If the wrong current code is given, the change must be rejected and the code must stay the same.
+ * - Give the locker a final locker number, fixed at creation.
  */
 public class PROGRAM4 {
 
-    /**
-     * Computes totals for section A and section B, compares balances,
-     * and locates the overall highest quantity item.
-     *
-     * @param sectionA array of item quantities in Section A
-     * @param sectionB array of item quantities in Section B
-     */
-    public static void analyzeInventory(int[] sectionA, int[] sectionB) {
-        if (sectionA == null || sectionB == null || sectionA.length == 0 || sectionB.length == 0) {
-            System.out.println("Invalid inventory data.");
-            return;
+    static class Locker {
+        private final int lockerNumber;
+        private String code;
+
+        public Locker(int lockerNumber, String initialCode) {
+            this.lockerNumber = lockerNumber;
+            this.code = initialCode;
         }
 
-        int lengthA = sectionA.length;
-        int lengthB = sectionB.length;
+        public int getLockerNumber() {
+            return lockerNumber;
+        }
 
-        int totalA = 0;
-        int totalB = 0;
-
-        int maxQuantity = Integer.MIN_VALUE;
-        String maxSection = "";
-        int maxIndex = -1; // 1-based item index
-
-        // Scan Section A
-        for (int i = 0; i < lengthA; i++) {
-            totalA += sectionA[i];
-            if (sectionA[i] > maxQuantity) {
-                maxQuantity = sectionA[i];
-                maxSection = "Section A";
-                maxIndex = i + 1; // 1-based index (e.g. Item 1, Item 2...)
+        public boolean changeCode(String currentCode, String newCode) {
+            if (this.code.equals(currentCode)) {
+                this.code = newCode;
+                System.out.println("Code change -> success");
+                return true;
+            } else {
+                System.out.println("Code change -> rejected, code remains unchanged");
+                return false;
             }
         }
-
-        // Scan Section B
-        for (int i = 0; i < lengthB; i++) {
-            totalB += sectionB[i];
-            if (sectionB[i] > maxQuantity) {
-                maxQuantity = sectionB[i];
-                maxSection = "Section B";
-                maxIndex = i + 1;
-            }
-        }
-
-        String status = (totalA == totalB) ? "Balanced" : "Not Balanced";
-
-        System.out.println("Section A Total: " + totalA + " | Section B Total: " + totalB +
-                           " | Status: " + status + " | Highest Quantity: " + maxQuantity +
-                           " (" + maxSection + ", Item " + maxIndex + ")");
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter number of categories per section: ");
-            if (scanner.hasNextInt()) {
-                int count = scanner.nextInt();
-                int[] sectionA = new int[count];
-                int[] sectionB = new int[count];
+        System.out.println("=== Testing Locker ===");
+        Locker l = new Locker(101, "1234");
+        System.out.println("Created Locker: " + l.getLockerNumber());
 
-                System.out.println("Enter " + count + " quantities for Section A:");
-                for (int i = 0; i < count; i++) {
-                    sectionA[i] = scanner.nextInt();
-                }
-
-                System.out.println("Enter " + count + " quantities for Section B:");
-                for (int i = 0; i < count; i++) {
-                    sectionB[i] = scanner.nextInt();
-                }
-
-                analyzeInventory(sectionA, sectionB);
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred while analyzing inventory: " + e.getMessage());
-        } finally {
-            scanner.close();
-        }
+        l.changeCode("1234", "5678");
+        l.changeCode("0000", "9999");
     }
 }
