@@ -1,63 +1,45 @@
-import java.util.Scanner;
-
 /**
- * Week 1 - Problem 3: The Traffic Signal Streak Analyzer
- * Scans a sequence of signal readings and finds the longest continuous streak of the same color.
+ * Category C - Practice Problem 3: The Nickname Tag
+ * 
+ * Scenario:
+ * A chat app shows a friendly short nickname instead of your full name.
+ * 
+ * Problem Statement:
+ * Create an immutable NameTag class that takes a full name once and builds a nickname from it - first name plus the last name's initial.
+ * 
+ * Requirements:
+ * - Take one full name string in the constructor (e.g., "Maria Gomez") and split it into first and last name.
+ * - Store whatever you keep as final fields - nothing about the name should be changeable after creation.
+ * - Provide a method that returns the nickname (e.g., "Maria G."), built from the stored parts.
+ * - Assume the full name always has exactly one first name and one last name, separated by a single space.
  */
 public class PROGRAM3 {
 
-    /**
-     * Finds and prints the color and length of the longest continuous streak.
-     *
-     * @param signalLog sequence string containing signal readings (e.g., 'R', 'Y', 'G')
-     */
-    public static void findLongestStreak(String signalLog) {
-        if (signalLog == null || signalLog.isEmpty()) {
-            System.out.println("Invalid or empty signal log.");
-            return;
+    static final class NameTag {
+        private final String firstName;
+        private final String lastNameInitial;
+
+        public NameTag(String fullName) {
+            String[] parts = fullName.split(" ");
+            this.firstName = parts[0];
+            this.lastNameInitial = parts[1].substring(0, 1) + ".";
         }
 
-        char longestColor = signalLog.charAt(0);
-        int maxStreakLength = 1;
-
-        char currentColor = signalLog.charAt(0);
-        int currentStreakLength = 1;
-
-        for (int i = 1; i < signalLog.length(); i++) {
-            char reading = signalLog.charAt(i);
-            if (reading == currentColor) {
-                currentStreakLength++;
-            } else {
-                if (currentStreakLength > maxStreakLength) {
-                    maxStreakLength = currentStreakLength;
-                    longestColor = currentColor;
-                }
-                currentColor = reading;
-                currentStreakLength = 1;
-            }
+        public String getNickname() {
+            return firstName + " " + lastNameInitial;
         }
 
-        // Check the final streak
-        if (currentStreakLength > maxStreakLength) {
-            maxStreakLength = currentStreakLength;
-            longestColor = currentColor;
+        public String getFirstName() {
+            return firstName;
         }
-
-        System.out.println("Longest Streak: '" + longestColor + "' repeated " + maxStreakLength + " times");
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter signal log: ");
-            if (scanner.hasNextLine()) {
-                String logInput = scanner.nextLine().trim();
-                findLongestStreak(logInput);
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred: " + e.getMessage());
-        } finally {
-            scanner.close();
-        }
+        System.out.println("=== Testing NameTag ===");
+        NameTag tag = new NameTag("Maria Gomez");
+        System.out.println("tag.getNickname() -> " + tag.getNickname());
+
+        NameTag tag2 = new NameTag("John Doe");
+        System.out.println("tag2.getNickname() -> " + tag2.getNickname());
     }
 }
