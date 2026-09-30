@@ -1,83 +1,112 @@
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Week 1 - Problem 2: The Typing Speed Test Accuracy Checker
- * Compares typed text against original passage character by character and calculates accuracy percentage.
+ * Week 8 Assignment - Problem 2: The Campus Parking Charge Calculator
+ * Category C
+ * 
+ * Demonstrates polymorphism:
+ * Base class Vehicle with subclasses Bike, Car, Truck.
  */
 public class PROGRAM2 {
 
-    /**
-     * Compares original and typed strings and prints accuracy and first mismatch info.
-     *
-     * @param original original passage text
-     * @param typed    user's typed text
-     */
-    public static void checkTypingAccuracy(String original, String typed) {
-        if (original == null || typed == null) {
-            System.out.println("Invalid input: Strings cannot be null.");
-            return;
+    abstract static class Vehicle {
+        protected int hours;
+
+        public Vehicle(int hours) {
+            this.hours = hours;
         }
 
-        int originalLength = original.length();
-        int typedLength = typed.length();
+        public abstract String getVehicleType();
+        public abstract double calculateParkingCharge();
+    }
 
-        // Compare up to the length of the strings
-        int totalLength = Math.min(originalLength, typedLength);
-        if (totalLength == 0) {
-            System.out.println("Matched: 0/0 | Accuracy: 0.00% | No Mismatches");
-            return;
+    static class Bike extends Vehicle {
+        public Bike(int hours) {
+            super(hours);
         }
 
-        int matchedCount = 0;
-        int firstMismatchPosition = -1;
-        char originalCharMismatch = ' ';
-        char typedCharMismatch = ' ';
+        @Override
+        public String getVehicleType() {
+            return "BIKE";
+        }
 
-        for (int i = 0; i < totalLength; i++) {
-            char origChar = original.charAt(i);
-            char typedChar = typed.charAt(i);
+        @Override
+        public double calculateParkingCharge() {
+            // Bike: 10 per hour
+            return hours * 10.0;
+        }
+    }
 
-            if (origChar == typedChar) {
-                matchedCount++;
-            } else if (firstMismatchPosition == -1) {
-                firstMismatchPosition = i + 1; // 1-based index position
-                originalCharMismatch = origChar;
-                typedCharMismatch = typedChar;
+    static class Car extends Vehicle {
+        public Car(int hours) {
+            super(hours);
+        }
+
+        @Override
+        public String getVehicleType() {
+            return "CAR";
+        }
+
+        @Override
+        public double calculateParkingCharge() {
+            // Car: 30 for first hour, plus 20 for each additional hour
+            if (hours <= 1) {
+                return 30.0;
+            } else {
+                return 30.0 + (hours - 1) * 20.0;
             }
         }
+    }
 
-        double accuracyPercentage = ((double) matchedCount / totalLength) * 100.0;
-
-        StringBuilder reportBuilder = new StringBuilder();
-        reportBuilder.append("Matched: ").append(matchedCount).append("/").append(totalLength)
-                     .append(" | Accuracy: ").append(String.format("%.2f", accuracyPercentage)).append("%");
-
-        if (firstMismatchPosition != -1) {
-            reportBuilder.append(" | First Mismatch at position ").append(firstMismatchPosition)
-                         .append(" ('").append(originalCharMismatch).append("' vs '")
-                         .append(typedCharMismatch).append("')");
-        } else if (originalLength != typedLength) {
-            reportBuilder.append(" | First Mismatch at position ").append(totalLength + 1)
-                         .append(" (Length difference)");
-        } else {
-            reportBuilder.append(" | No Mismatches");
+    static class Truck extends Vehicle {
+        public Truck(int hours) {
+            super(hours);
         }
 
-        System.out.println(reportBuilder.toString());
+        @Override
+        public String getVehicleType() {
+            return "TRUCK";
+        }
+
+        @Override
+        public double calculateParkingCharge() {
+            // Truck: 50 per hour, with a minimum charge of 100
+            double charge = hours * 50.0;
+            return Math.max(charge, 100.0);
+        }
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter original passage: ");
-            String originalText = scanner.nextLine();
-            System.out.print("Enter typed text: ");
-            String typedText = scanner.nextLine();
-            checkTypingAccuracy(originalText, typedText);
-        } catch (Exception e) {
-            System.err.println("An error occurred while evaluating typing accuracy: " + e.getMessage());
-        } finally {
-            scanner.close();
+        if (!scanner.hasNextInt()) {
+            return;
         }
+        int n = scanner.nextInt();
+        List<Vehicle> vehicles = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            String type = scanner.next();
+            int hours = scanner.nextInt();
+
+            if ("BIKE".equalsIgnoreCase(type)) {
+                vehicles.add(new Bike(hours));
+            } else if ("CAR".equalsIgnoreCase(type)) {
+                vehicles.add(new Car(hours));
+            } else if ("TRUCK".equalsIgnoreCase(type)) {
+                vehicles.add(new Truck(hours));
+            }
+        }
+
+        double grandTotal = 0.0;
+        for (Vehicle v : vehicles) {
+            double charge = v.calculateParkingCharge();
+            System.out.printf("%s: %.2f\n", v.getVehicleType(), charge);
+            grandTotal += charge;
+        }
+
+        System.out.printf("Total: %.2f\n", grandTotal);
+        scanner.close();
     }
 }
