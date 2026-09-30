@@ -1,86 +1,98 @@
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Week 1 - Problem 4: The Warehouse Inventory Balancer
- * Computes section totals, evaluates inventory balance, and tracks the maximum quantity item.
+ * Week 8 Assignment - Problem 4: The Festival Bonus Calculator
+ * Category C
+ * 
+ * Demonstrates polymorphism:
+ * Base class Employee with subclasses FullTimeEmployee, PartTimeEmployee, InternEmployee.
  */
 public class PROGRAM4 {
 
-    /**
-     * Computes totals for section A and section B, compares balances,
-     * and locates the overall highest quantity item.
-     *
-     * @param sectionA array of item quantities in Section A
-     * @param sectionB array of item quantities in Section B
-     */
-    public static void analyzeInventory(int[] sectionA, int[] sectionB) {
-        if (sectionA == null || sectionB == null || sectionA.length == 0 || sectionB.length == 0) {
-            System.out.println("Invalid inventory data.");
-            return;
+    abstract static class Employee {
+        protected String name;
+        protected double monthlySalary;
+
+        public Employee(String name, double monthlySalary) {
+            this.name = name;
+            this.monthlySalary = monthlySalary;
         }
 
-        int lengthA = sectionA.length;
-        int lengthB = sectionB.length;
-
-        int totalA = 0;
-        int totalB = 0;
-
-        int maxQuantity = Integer.MIN_VALUE;
-        String maxSection = "";
-        int maxIndex = -1; // 1-based item index
-
-        // Scan Section A
-        for (int i = 0; i < lengthA; i++) {
-            totalA += sectionA[i];
-            if (sectionA[i] > maxQuantity) {
-                maxQuantity = sectionA[i];
-                maxSection = "Section A";
-                maxIndex = i + 1; // 1-based index (e.g. Item 1, Item 2...)
-            }
+        public String getName() {
+            return name;
         }
 
-        // Scan Section B
-        for (int i = 0; i < lengthB; i++) {
-            totalB += sectionB[i];
-            if (sectionB[i] > maxQuantity) {
-                maxQuantity = sectionB[i];
-                maxSection = "Section B";
-                maxIndex = i + 1;
-            }
+        public abstract double calculateBonus();
+    }
+
+    static class FullTimeEmployee extends Employee {
+        public FullTimeEmployee(String name, double monthlySalary) {
+            super(name, monthlySalary);
         }
 
-        String status = (totalA == totalB) ? "Balanced" : "Not Balanced";
+        @Override
+        public double calculateBonus() {
+            // Full-time employees get 10% of monthly salary
+            return monthlySalary * 0.10;
+        }
+    }
 
-        System.out.println("Section A Total: " + totalA + " | Section B Total: " + totalB +
-                           " | Status: " + status + " | Highest Quantity: " + maxQuantity +
-                           " (" + maxSection + ", Item " + maxIndex + ")");
+    static class PartTimeEmployee extends Employee {
+        public PartTimeEmployee(String name, double monthlySalary) {
+            super(name, monthlySalary);
+        }
+
+        @Override
+        public double calculateBonus() {
+            // Part-time employees get 5% of monthly salary
+            return monthlySalary * 0.05;
+        }
+    }
+
+    static class InternEmployee extends Employee {
+        public InternEmployee(String name, double monthlySalary) {
+            super(name, monthlySalary);
+        }
+
+        @Override
+        public double calculateBonus() {
+            // Interns get a fixed bonus of 2000
+            return 2000.0;
+        }
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter number of categories per section: ");
-            if (scanner.hasNextInt()) {
-                int count = scanner.nextInt();
-                int[] sectionA = new int[count];
-                int[] sectionB = new int[count];
-
-                System.out.println("Enter " + count + " quantities for Section A:");
-                for (int i = 0; i < count; i++) {
-                    sectionA[i] = scanner.nextInt();
-                }
-
-                System.out.println("Enter " + count + " quantities for Section B:");
-                for (int i = 0; i < count; i++) {
-                    sectionB[i] = scanner.nextInt();
-                }
-
-                analyzeInventory(sectionA, sectionB);
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred while analyzing inventory: " + e.getMessage());
-        } finally {
-            scanner.close();
+        if (!scanner.hasNextInt()) {
+            return;
         }
+        int n = scanner.nextInt();
+        List<Employee> employees = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            String type = scanner.next();
+            String name = scanner.next();
+            double salary = scanner.nextDouble();
+
+            if ("FULLTIME".equalsIgnoreCase(type)) {
+                employees.add(new FullTimeEmployee(name, salary));
+            } else if ("PARTTIME".equalsIgnoreCase(type)) {
+                employees.add(new PartTimeEmployee(name, salary));
+            } else if ("INTERN".equalsIgnoreCase(type)) {
+                employees.add(new InternEmployee(name, salary));
+            }
+        }
+
+        double totalBonus = 0.0;
+        for (Employee emp : employees) {
+            double bonus = emp.calculateBonus();
+            System.out.printf("%s: %.2f\n", emp.getName(), bonus);
+            totalBonus += bonus;
+        }
+
+        System.out.printf("Total Bonus: %.2f\n", totalBonus);
+        scanner.close();
     }
 }
