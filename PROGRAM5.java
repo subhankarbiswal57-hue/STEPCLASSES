@@ -1,66 +1,111 @@
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Week 1 - Problem 5: The Movie Review Word Length Profiler
- * Scans a review text, splits into individual words, and categorizes lengths:
- * Short (1-4 letters), Medium (5-8 letters), Long (9+ letters).
+ * Week 8 Practice - Problem 5: Public Transport Fare Calculator
+ * 
+ * Demonstrates polymorphism:
+ * Base class PublicTransport with subclasses Bus, Train, Metro.
  */
 public class PROGRAM5 {
 
-    /**
-     * Splits review text into words, categorizes each word by character length, and prints counts.
-     *
-     * @param review movie review string
-     */
-    public static void classifyWordLengths(String review) {
-        if (review == null || review.trim().isEmpty()) {
-            System.out.println("Short: 0 | Medium: 0 | Long: 0");
-            return;
+    abstract static class PublicTransport {
+        protected double distance;
+
+        public PublicTransport(double distance) {
+            this.distance = distance;
         }
 
-        // Split review into individual words using whitespace regex
-        String[] words = review.trim().split("\\s+");
+        public abstract String getTransportType();
+        public abstract double calculateFare();
+    }
 
-        int shortCount = 0;
-        int mediumCount = 0;
-        int longCount = 0;
-
-        for (String rawWord : words) {
-            // Count letter characters in the word (strip punctuation if any)
-            int letterLength = 0;
-            for (int i = 0; i < rawWord.length(); i++) {
-                if (Character.isLetter(rawWord.charAt(i))) {
-                    letterLength++;
-                }
-            }
-
-            // If no letters found, fallback to total length
-            int effectiveLength = (letterLength > 0) ? letterLength : rawWord.length();
-
-            if (effectiveLength >= 1 && effectiveLength <= 4) {
-                shortCount++;
-            } else if (effectiveLength >= 5 && effectiveLength <= 8) {
-                mediumCount++;
-            } else if (effectiveLength >= 9) {
-                longCount++;
-            }
+    static class Bus extends PublicTransport {
+        public Bus(double distance) {
+            super(distance);
         }
 
-        System.out.println("Short: " + shortCount + " | Medium: " + mediumCount + " | Long: " + longCount);
+        @Override
+        public String getTransportType() {
+            return "BUS";
+        }
+
+        @Override
+        public double calculateFare() {
+            // Base fare $2, plus $0.10 per km. Max fare $10.
+            double fare = 2.0 + (0.10 * distance);
+            return Math.min(fare, 10.0);
+        }
+    }
+
+    static class Train extends PublicTransport {
+        public Train(double distance) {
+            super(distance);
+        }
+
+        @Override
+        public String getTransportType() {
+            return "TRAIN";
+        }
+
+        @Override
+        public double calculateFare() {
+            // Base fare $3, plus $0.15 per km.
+            return 3.0 + (0.15 * distance);
+        }
+    }
+
+    static class Metro extends PublicTransport {
+        private double peakHourFactor;
+
+        public Metro(double distance, double peakHourFactor) {
+            super(distance);
+            this.peakHourFactor = peakHourFactor;
+        }
+
+        @Override
+        public String getTransportType() {
+            return "METRO";
+        }
+
+        @Override
+        public double calculateFare() {
+            // Base fare $1.50, plus $0.20 per km, multiplied by a PeakHourFactor.
+            return (1.50 + 0.20 * distance) * peakHourFactor;
+        }
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter movie review: ");
-            if (scanner.hasNextLine()) {
-                String reviewText = scanner.nextLine();
-                classifyWordLengths(reviewText);
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred while profiling review: " + e.getMessage());
-        } finally {
-            scanner.close();
+        if (!scanner.hasNextInt()) {
+            return;
         }
+        int n = scanner.nextInt();
+        List<PublicTransport> journeys = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            String type = scanner.next();
+            double distance = scanner.nextDouble();
+
+            if ("BUS".equalsIgnoreCase(type)) {
+                journeys.add(new Bus(distance));
+            } else if ("TRAIN".equalsIgnoreCase(type)) {
+                journeys.add(new Train(distance));
+            } else if ("METRO".equalsIgnoreCase(type)) {
+                double factor = scanner.nextDouble();
+                journeys.add(new Metro(distance, factor));
+            }
+        }
+
+        double grandTotal = 0.0;
+        for (PublicTransport journey : journeys) {
+            double fare = journey.calculateFare();
+            System.out.printf("%s: %.2f\n", journey.getTransportType(), fare);
+            grandTotal += fare;
+        }
+
+        System.out.printf("Total: %.2f\n", grandTotal);
+        scanner.close();
     }
 }

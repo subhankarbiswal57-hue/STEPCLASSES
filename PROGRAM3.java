@@ -1,63 +1,110 @@
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Week 1 - Problem 3: The Traffic Signal Streak Analyzer
- * Scans a sequence of signal readings and finds the longest continuous streak of the same color.
+ * Week 8 Practice - Problem 3: Delivery Fee Calculator
+ * 
+ * Demonstrates polymorphism:
+ * Base class DeliveryRequest with specialized subclasses StandardDelivery, ExpressDelivery, InternationalDelivery.
  */
 public class PROGRAM3 {
 
-    /**
-     * Finds and prints the color and length of the longest continuous streak.
-     *
-     * @param signalLog sequence string containing signal readings (e.g., 'R', 'Y', 'G')
-     */
-    public static void findLongestStreak(String signalLog) {
-        if (signalLog == null || signalLog.isEmpty()) {
-            System.out.println("Invalid or empty signal log.");
-            return;
+    abstract static class DeliveryRequest {
+        protected double weight;
+        protected double distance;
+
+        public DeliveryRequest(double weight, double distance) {
+            this.weight = weight;
+            this.distance = distance;
         }
 
-        char longestColor = signalLog.charAt(0);
-        int maxStreakLength = 1;
+        public abstract String getDeliveryType();
+        public abstract double calculateFee();
+    }
 
-        char currentColor = signalLog.charAt(0);
-        int currentStreakLength = 1;
-
-        for (int i = 1; i < signalLog.length(); i++) {
-            char reading = signalLog.charAt(i);
-            if (reading == currentColor) {
-                currentStreakLength++;
-            } else {
-                if (currentStreakLength > maxStreakLength) {
-                    maxStreakLength = currentStreakLength;
-                    longestColor = currentColor;
-                }
-                currentColor = reading;
-                currentStreakLength = 1;
-            }
+    static class StandardDelivery extends DeliveryRequest {
+        public StandardDelivery(double weight, double distance) {
+            super(weight, distance);
         }
 
-        // Check the final streak
-        if (currentStreakLength > maxStreakLength) {
-            maxStreakLength = currentStreakLength;
-            longestColor = currentColor;
+        @Override
+        public String getDeliveryType() {
+            return "STANDARD";
         }
 
-        System.out.println("Longest Streak: '" + longestColor + "' repeated " + maxStreakLength + " times");
+        @Override
+        public double calculateFee() {
+            return 5.0 + (0.50 * weight) + (0.10 * distance);
+        }
+    }
+
+    static class ExpressDelivery extends DeliveryRequest {
+        public ExpressDelivery(double weight, double distance) {
+            super(weight, distance);
+        }
+
+        @Override
+        public String getDeliveryType() {
+            return "EXPRESS";
+        }
+
+        @Override
+        public double calculateFee() {
+            return 15.0 + (1.00 * weight) + (0.20 * distance);
+        }
+    }
+
+    static class InternationalDelivery extends DeliveryRequest {
+        private double customsFee;
+
+        public InternationalDelivery(double weight, double distance, double customsFee) {
+            super(weight, distance);
+            this.customsFee = customsFee;
+        }
+
+        @Override
+        public String getDeliveryType() {
+            return "INTERNATIONAL";
+        }
+
+        @Override
+        public double calculateFee() {
+            return 25.0 + (2.00 * weight) + (0.50 * distance) + customsFee;
+        }
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter signal log: ");
-            if (scanner.hasNextLine()) {
-                String logInput = scanner.nextLine().trim();
-                findLongestStreak(logInput);
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred: " + e.getMessage());
-        } finally {
-            scanner.close();
+        if (!scanner.hasNextInt()) {
+            return;
         }
+        int n = scanner.nextInt();
+        List<DeliveryRequest> requests = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            String type = scanner.next();
+            double weight = scanner.nextDouble();
+            double distance = scanner.nextDouble();
+
+            if ("STANDARD".equalsIgnoreCase(type)) {
+                requests.add(new StandardDelivery(weight, distance));
+            } else if ("EXPRESS".equalsIgnoreCase(type)) {
+                requests.add(new ExpressDelivery(weight, distance));
+            } else if ("INTERNATIONAL".equalsIgnoreCase(type)) {
+                double customsFee = scanner.nextDouble();
+                requests.add(new InternationalDelivery(weight, distance, customsFee));
+            }
+        }
+
+        double totalFee = 0.0;
+        for (DeliveryRequest req : requests) {
+            double fee = req.calculateFee();
+            System.out.printf("%s: %.2f\n", req.getDeliveryType(), fee);
+            totalFee += fee;
+        }
+
+        System.out.printf("Total: %.2f\n", totalFee);
+        scanner.close();
     }
 }

@@ -1,86 +1,174 @@
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Week 1 - Problem 4: The Warehouse Inventory Balancer
- * Computes section totals, evaluates inventory balance, and tracks the maximum quantity item.
+ * Week 8 Practice - Problem 4: Examination Question Grader
+ * 
+ * Demonstrates polymorphism:
+ * Base class Question with subclasses MCQQuestion, TFQuestion, EssayQuestion.
  */
 public class PROGRAM4 {
 
-    /**
-     * Computes totals for section A and section B, compares balances,
-     * and locates the overall highest quantity item.
-     *
-     * @param sectionA array of item quantities in Section A
-     * @param sectionB array of item quantities in Section B
-     */
-    public static void analyzeInventory(int[] sectionA, int[] sectionB) {
-        if (sectionA == null || sectionB == null || sectionA.length == 0 || sectionB.length == 0) {
-            System.out.println("Invalid inventory data.");
-            return;
+    abstract static class Question {
+        protected String questionText;
+        protected String correctAnswer;
+        protected String studentAnswer;
+        protected double points;
+
+        public Question(String questionText, String correctAnswer, String studentAnswer, double points) {
+            this.questionText = questionText;
+            this.correctAnswer = correctAnswer;
+            this.studentAnswer = studentAnswer;
+            this.points = points;
         }
 
-        int lengthA = sectionA.length;
-        int lengthB = sectionB.length;
+        public abstract String getQuestionType();
+        public abstract double evaluateScore();
+    }
 
-        int totalA = 0;
-        int totalB = 0;
+    static class MCQQuestion extends Question {
+        public MCQQuestion(String questionText, String correctAnswer, String studentAnswer, double points) {
+            super(questionText, correctAnswer, studentAnswer, points);
+        }
 
-        int maxQuantity = Integer.MIN_VALUE;
-        String maxSection = "";
-        int maxIndex = -1; // 1-based item index
+        @Override
+        public String getQuestionType() {
+            return "MCQ";
+        }
 
-        // Scan Section A
-        for (int i = 0; i < lengthA; i++) {
-            totalA += sectionA[i];
-            if (sectionA[i] > maxQuantity) {
-                maxQuantity = sectionA[i];
-                maxSection = "Section A";
-                maxIndex = i + 1; // 1-based index (e.g. Item 1, Item 2...)
+        @Override
+        public double evaluateScore() {
+            return studentAnswer.equals(correctAnswer) ? points : 0.0;
+        }
+    }
+
+    static class TFQuestion extends Question {
+        public TFQuestion(String questionText, String correctAnswer, String studentAnswer, double points) {
+            super(questionText, correctAnswer, studentAnswer, points);
+        }
+
+        @Override
+        public String getQuestionType() {
+            return "TF";
+        }
+
+        @Override
+        public double evaluateScore() {
+            return studentAnswer.equalsIgnoreCase(correctAnswer) ? points : 0.0;
+        }
+    }
+
+    static class EssayQuestion extends Question {
+        public EssayQuestion(String questionText, String correctAnswer, String studentAnswer, double points) {
+            super(questionText, correctAnswer, studentAnswer, points);
+        }
+
+        @Override
+        public String getQuestionType() {
+            return "ESSAY";
+        }
+
+        @Override
+        public double evaluateScore() {
+            String[] keywords = correctAnswer.split(",");
+            int matched = 0;
+            String lowerStudentAnswer = studentAnswer.toLowerCase();
+
+            for (String kw : keywords) {
+                String cleanKw = kw.trim().toLowerCase();
+                if (!cleanKw.isEmpty() && lowerStudentAnswer.contains(cleanKw)) {
+                    matched++;
+                }
+            }
+
+            if (matched >= 2) {
+                return points * 0.75;
+            } else if (matched == 1) {
+                return points * 0.50;
+            } else {
+                return 0.0;
             }
         }
+    }
 
-        // Scan Section B
-        for (int i = 0; i < lengthB; i++) {
-            totalB += sectionB[i];
-            if (sectionB[i] > maxQuantity) {
-                maxQuantity = sectionB[i];
-                maxSection = "Section B";
-                maxIndex = i + 1;
+    private static List<String> parseTokens(String line) {
+        List<String> tokens = new ArrayList<>();
+        int i = 0;
+        int n = line.length();
+
+        while (i < n) {
+            while (i < n && Character.isWhitespace(line.charAt(i))) {
+                i++;
+            }
+            if (i >= n) break;
+
+            if (line.charAt(i) == '"') {
+                i++;
+                StringBuilder sb = new StringBuilder();
+                while (i < n && line.charAt(i) != '"') {
+                    sb.append(line.charAt(i));
+                    i++;
+                }
+                if (i < n && line.charAt(i) == '"') {
+                    i++; // skip closing quote
+                }
+                tokens.add(sb.toString());
+            } else {
+                StringBuilder sb = new StringBuilder();
+                while (i < n && !Character.isWhitespace(line.charAt(i))) {
+                    sb.append(line.charAt(i));
+                    i++;
+                }
+                tokens.add(sb.toString());
             }
         }
-
-        String status = (totalA == totalB) ? "Balanced" : "Not Balanced";
-
-        System.out.println("Section A Total: " + totalA + " | Section B Total: " + totalB +
-                           " | Status: " + status + " | Highest Quantity: " + maxQuantity +
-                           " (" + maxSection + ", Item " + maxIndex + ")");
+        return tokens;
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter number of categories per section: ");
-            if (scanner.hasNextInt()) {
-                int count = scanner.nextInt();
-                int[] sectionA = new int[count];
-                int[] sectionB = new int[count];
-
-                System.out.println("Enter " + count + " quantities for Section A:");
-                for (int i = 0; i < count; i++) {
-                    sectionA[i] = scanner.nextInt();
-                }
-
-                System.out.println("Enter " + count + " quantities for Section B:");
-                for (int i = 0; i < count; i++) {
-                    sectionB[i] = scanner.nextInt();
-                }
-
-                analyzeInventory(sectionA, sectionB);
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred while analyzing inventory: " + e.getMessage());
-        } finally {
-            scanner.close();
+        if (!scanner.hasNextLine()) {
+            return;
         }
+        String firstLine = scanner.nextLine().trim();
+        if (firstLine.isEmpty()) {
+            return;
+        }
+        int n = Integer.parseInt(firstLine);
+        List<Question> questions = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            String line = scanner.nextLine().trim();
+            if (line.isEmpty()) {
+                continue;
+            }
+            List<String> tokens = parseTokens(line);
+            if (tokens.size() < 5) continue;
+
+            String type = tokens.get(0);
+            String qText = tokens.get(1);
+            String correctAns = tokens.get(2);
+            String studentAns = tokens.get(3);
+            double points = Double.parseDouble(tokens.get(4));
+
+            if ("MCQ".equalsIgnoreCase(type)) {
+                questions.add(new MCQQuestion(qText, correctAns, studentAns, points));
+            } else if ("TF".equalsIgnoreCase(type)) {
+                questions.add(new TFQuestion(qText, correctAns, studentAns, points));
+            } else if ("ESSAY".equalsIgnoreCase(type)) {
+                questions.add(new EssayQuestion(qText, correctAns, studentAns, points));
+            }
+        }
+
+        double totalScore = 0.0;
+        for (Question q : questions) {
+            double score = q.evaluateScore();
+            System.out.printf("%s: %.2f\n", q.getQuestionType(), score);
+            totalScore += score;
+        }
+
+        System.out.printf("Total Score: %.2f\n", totalScore);
+        scanner.close();
     }
 }
