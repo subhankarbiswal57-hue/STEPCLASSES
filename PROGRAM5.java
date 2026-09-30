@@ -1,66 +1,99 @@
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
- * Week 1 - Problem 5: The Movie Review Word Length Profiler
- * Scans a review text, splits into individual words, and categorizes lengths:
- * Short (1-4 letters), Medium (5-8 letters), Long (9+ letters).
+ * Week 8 Assignment - Problem 5: The Streaming Plan Renewal Reminder
+ * Category C
+ * 
+ * Demonstrates polymorphism:
+ * Base class SubscriptionPlan with subclasses BasicPlan, StandardPlan, PremiumPlan.
  */
 public class PROGRAM5 {
 
-    /**
-     * Splits review text into words, categorizes each word by character length, and prints counts.
-     *
-     * @param review movie review string
-     */
-    public static void classifyWordLengths(String review) {
-        if (review == null || review.trim().isEmpty()) {
-            System.out.println("Short: 0 | Medium: 0 | Long: 0");
-            return;
+    abstract static class SubscriptionPlan {
+        protected String subscriberName;
+        protected LocalDate startDate;
+
+        public SubscriptionPlan(String subscriberName, LocalDate startDate) {
+            this.subscriberName = subscriberName;
+            this.startDate = startDate;
         }
 
-        // Split review into individual words using whitespace regex
-        String[] words = review.trim().split("\\s+");
-
-        int shortCount = 0;
-        int mediumCount = 0;
-        int longCount = 0;
-
-        for (String rawWord : words) {
-            // Count letter characters in the word (strip punctuation if any)
-            int letterLength = 0;
-            for (int i = 0; i < rawWord.length(); i++) {
-                if (Character.isLetter(rawWord.charAt(i))) {
-                    letterLength++;
-                }
-            }
-
-            // If no letters found, fallback to total length
-            int effectiveLength = (letterLength > 0) ? letterLength : rawWord.length();
-
-            if (effectiveLength >= 1 && effectiveLength <= 4) {
-                shortCount++;
-            } else if (effectiveLength >= 5 && effectiveLength <= 8) {
-                mediumCount++;
-            } else if (effectiveLength >= 9) {
-                longCount++;
-            }
+        public String getSubscriberName() {
+            return subscriberName;
         }
 
-        System.out.println("Short: " + shortCount + " | Medium: " + mediumCount + " | Long: " + longCount);
+        public abstract LocalDate calculateRenewalDate();
+    }
+
+    static class BasicPlan extends SubscriptionPlan {
+        public BasicPlan(String subscriberName, LocalDate startDate) {
+            super(subscriberName, startDate);
+        }
+
+        @Override
+        public LocalDate calculateRenewalDate() {
+            // Basic plan: valid for 30 days
+            return startDate.plusDays(30);
+        }
+    }
+
+    static class StandardPlan extends SubscriptionPlan {
+        public StandardPlan(String subscriberName, LocalDate startDate) {
+            super(subscriberName, startDate);
+        }
+
+        @Override
+        public LocalDate calculateRenewalDate() {
+            // Standard plan: valid for 90 days
+            return startDate.plusDays(90);
+        }
+    }
+
+    static class PremiumPlan extends SubscriptionPlan {
+        public PremiumPlan(String subscriberName, LocalDate startDate) {
+            super(subscriberName, startDate);
+        }
+
+        @Override
+        public LocalDate calculateRenewalDate() {
+            // Premium plan: valid for 365 days
+            return startDate.plusDays(365);
+        }
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter movie review: ");
-            if (scanner.hasNextLine()) {
-                String reviewText = scanner.nextLine();
-                classifyWordLengths(reviewText);
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred while profiling review: " + e.getMessage());
-        } finally {
-            scanner.close();
+        if (!scanner.hasNextInt()) {
+            return;
         }
+        int n = scanner.nextInt();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        List<SubscriptionPlan> subscriptions = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            String planType = scanner.next();
+            String name = scanner.next();
+            String dateStr = scanner.next();
+            LocalDate startDate = LocalDate.parse(dateStr, formatter);
+
+            if ("BASIC".equalsIgnoreCase(planType)) {
+                subscriptions.add(new BasicPlan(name, startDate));
+            } else if ("STANDARD".equalsIgnoreCase(planType)) {
+                subscriptions.add(new StandardPlan(name, startDate));
+            } else if ("PREMIUM".equalsIgnoreCase(planType)) {
+                subscriptions.add(new PremiumPlan(name, startDate));
+            }
+        }
+
+        for (SubscriptionPlan plan : subscriptions) {
+            LocalDate renewalDate = plan.calculateRenewalDate();
+            System.out.printf("%s: %s\n", plan.getSubscriberName(), renewalDate.format(formatter));
+        }
+
+        scanner.close();
     }
 }
